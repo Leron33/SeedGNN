@@ -53,38 +53,39 @@ def run(n,p,s,L,Theta,Itera):
             G1, G2, seeds, truth = SynGraph(n,p,s,theta)
             datasets = [(G1, G2, seeds, truth)]
             eyes = torch.eye(n)
+            G1 = G1
             G12 = (( ((torch.mm(G1, G1))>0).float() - G1 - eyes)>0).float()
             G22 = (( ((torch.mm(G2, G2))>0).float() - G2 - eyes)>0).float()
             G13 = (( ((torch.mm(G12, G1))>0).float() - G12 - G1 - eyes)>0).float()
             G23 = (( ((torch.mm(G22, G2))>0).float() - G22 - G2 - eyes)>0).float()
             
-            # SeedGNN
-            # seedgnn[itera,thetai] = test(datasets)
+            SeedGNN
+            seedgnn[itera,thetai] = test(datasets)
              
             # other algorithms
-            # result = seeds
-            # for _ in range(L):
-            #     result = MultiHop(G1,G2,result)
-            # onehop6[itera,thetai] = sum((result[1]==truth).float())/n
+            result = seeds
+            for _ in range(L):
+                result = MultiHop(G1,G2,result)
+            onehop6[itera,thetai] = sum((result[1]==truth).float())/n
             
-            # result = seeds
-            # for _ in range(int(L/2)):
-            #     result = MultiHop(G12,G22,result)
-            # twohop3[itera,thetai] = sum((result[1]==truth).float())/n
+            result = seeds
+            for _ in range(int(L/2)):
+                result = MultiHop(G12,G22,result)
+            twohop3[itera,thetai] = sum((result[1]==truth).float())/n
             
-            # result = seeds        
-            # for _ in range(int(L/3)):
-            #     result = MultiHop(G13,G23,result)
-            # threehop2[itera,thetai] = sum((result[1]==truth).float())/n
+            result = seeds        
+            for _ in range(int(L/3)):
+                result = MultiHop(G13,G23,result)
+            threehop2[itera,thetai] = sum((result[1]==truth).float())/n
             
-            # result = PGM(G1,G2,seeds)
-            # pgm[itera,thetai] = sum(result==truth)/n
+            result = PGM(G1,G2,seeds)
+            pgm[itera,thetai] = sum(result==truth)/n
         
             result = SGM2(G1,G2,seeds)
             sgm[itera,thetai] = sum((result==truth).float())/n
             
-            # result = MGCN(G1,G2,seeds)
-            # mgcn[thetai] = sum((result==truth).float())/n        
+            result = MGCN(G1,G2,seeds)
+            mgcn[thetai] = sum((result==truth).float())/n        
 
     seedgnnstd, seedgnn = torch.std_mean(seedgnn,dim=0,unbiased=False)
     onehop6std,onehop6 = torch.std_mean(onehop6,dim=0,unbiased=False)
@@ -135,12 +136,6 @@ if __name__ ==  '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--hid', type=int, default=4)
     parser.add_argument('--num_layers', type=int, default=6)
-    parser.add_argument('--lr', type=float, default=0.01)
-    parser.add_argument('--batch_size', type=int, default=512)
-    parser.add_argument('--pre_epochs', type=int, default=15)
-    parser.add_argument('--epochs', type=int, default=100)
-    parser.add_argument('--runs', type=int, default=20)
-    parser.add_argument('--test_samples', type=int, default=100)
 
     args, unknown = parser.parse_known_args()
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -158,7 +153,7 @@ if __name__ ==  '__main__':
     p = 0.01
     s = 0.8
     Theta = torch.linspace(0, 0.2, steps=11)
-    Itera = 1
+    Itera = 10
     run(n,p,s,L,Theta,Itera)
 
     print('-----------------------------------------------')
@@ -168,8 +163,8 @@ if __name__ ==  '__main__':
     p = 0.2
     s = 0.8
     Theta = torch.linspace(0, 0.05, steps=11)
-    Itera = 1
+    Itera = 10
     run(n,p,s,L,Theta,Itera)
 
     end = time.time()
-    print('run: ',end-start)
+    print('run: ', end-start, 's')
