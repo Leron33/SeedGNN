@@ -68,37 +68,15 @@ class SeedGNN(torch.nn.Module):
         
         # S = -torch.ones([n1,n2])/n1
         # S[seeds[0],seeds[1]] = 1
-        S = Seeds.reshape(n1*n2,1)
+        S = Seeds.unsqueeze(-1)
         
         for layeri in range(self.num_layers):
-            # print('layer', layeri)
-            H = []
             
-            
-            S_dim = S.shape[-1]
-            for hidi in range(S_dim):
-                Si = S[:,hidi].reshape(n1,n2)
-                H.append(torch.sparse.mm(G2,torch.sparse.mm(G1,Si).T).T.reshape(-1,1))
-                # H.append(torch.mm(G1,torch.mm(Si,G2)).reshape(-1,1))
-            # process = []
-            # queue = mp.Queue()
-            # S_dim = S.shape[-1]
-            # for hidi in range(S_dim):
-            #     Si = S[:,hidi].reshape(n1,n2)
-            #     h = mp.Process(target=Agg, args=(G1,G2,Si,queue,))
-            #     h.start()
-            #     H.append(queue.get())
-            #     process.append(h)
-            # for h in process:
-            #     h.join()
-                
-                
-            H = torch.cat(H, dim = 1)
+            H = torch.einsum("abh,bc->ach",torch.einsum("ij,jkh->ikh",G1,S),G2)
             if layeri < self.num_layers-1:
                 X = self.mlp[layeri](H)/1000
                 
-            match = self.readout[layeri](H)
-            Match = match.reshape(n1,n2)
+            Match = self.readout[layeri](H).squeeze(-1)
             Matchnorm = masked_softmax(Match)
             Matchnorm[seeds[0],:]=0
             Matchnorm[:,seeds[1]]=0
@@ -110,9 +88,9 @@ class SeedGNN(torch.nn.Module):
             NewSeeds = torch.zeros([n1,n2])
             NewSeeds[row,col] = 10
             
-            Z = (Matchnorm*NewSeeds).view(-1,1)
+            Z = (Matchnorm*NewSeeds).unsqueeze(-1)
     
-            S = torch.cat([X,Z],dim=1)
+            S = torch.cat([X,Z],dim = 2)
         
        
         return Y_total[-1], Y_total
