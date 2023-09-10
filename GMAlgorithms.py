@@ -66,8 +66,6 @@ def facebookGraph(realpath,s,alpha,theta,sample=True):
         
     G1 = G1[truth,:][:,truth]
     
-    G1 = G1.to_sparse()
-    G2 = G2.to_sparse()
     
     numseeds = int(n*theta)
     indices = torch.randperm(n)[:numseeds]
@@ -92,8 +90,6 @@ def WillowGraph(datas, datat, numseeds, seed_method=1):
     x1 = x1[truth,:]
     
     
-    G1 = G1.to_sparse()
-    G2 = G2.to_sparse()
     if seed_method == 2:
         indices = torch.randperm(n)[:numseeds]
         seeds = [indices, truth[indices]]
@@ -178,12 +174,6 @@ def ShrecGraph(realpath,i,j,theta):
     path1 = realpath +str(i)+'_ref.txt'    
     path2 = realpath +str(j)+'_ref.txt'  
     truth = merge_gt(path1,path2)
-    
-    n1 = G1.shape[0]
-    n2 = G2.shape[0]
-    
-    G1 = G1.to_sparse()
-    G2 = G2.to_sparse()
     
     n = truth.size(1)
     numseeds = int(n*theta)
