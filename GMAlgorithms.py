@@ -32,9 +32,7 @@ def SynGraph(n, p, s, theta, degreesort = False):
         truth = torch.randperm(n)
         
     G1 = G1[truth,:][:,truth]
-    
-    G1 = G1.to_sparse()
-    G2 = G2.to_sparse()
+
     
     numseeds = int(n*theta)
     indices = torch.randperm(n)[:numseeds]
