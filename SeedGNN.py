@@ -1,14 +1,7 @@
 import torch
 from torch.nn import Sequential as Seq, Linear as Lin
-import torch.nn as nn
-from torch_scatter import scatter_add
-from torch_geometric.utils import to_dense_batch
 from torch_geometric.nn.inits import reset
-from torch.autograd import Variable
 from scipy.optimize import linear_sum_assignment
-import time
-#torch.multiprocessing.set_start_method("spawn")
-import torch.multiprocessing as mp
 
 try:
     from pykeops.torch import LazyTensor
