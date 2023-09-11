@@ -18,11 +18,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--hid', type=int, default=4)
 parser.add_argument('--num_layers', type=int, default=6)
 parser.add_argument('--lr', type=float, default=0.01)
-parser.add_argument('--batch_size', type=int, default=512)
-parser.add_argument('--pre_epochs', type=int, default=15)
-parser.add_argument('--epochs', type=int, default=100)
-parser.add_argument('--runs', type=int, default=20)
-parser.add_argument('--test_samples', type=int, default=100)
 
 args, unknown = parser.parse_known_args()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -85,10 +80,10 @@ def run(numgraphs,s,alpha,L,Theta):
                 n2 = G2.shape[0]
                 eyes1 = torch.eye(n1)
                 eyes2 = torch.eye(n2)
-                G12 = (( ((torch.sparse.mm(G1, G1.to_dense()))>0).float() - G1 - eyes1)>0).float()
-                G22 = (( ((torch.sparse.mm(G2, G2.to_dense()))>0).float() - G2 - eyes2)>0).float()
-                G13 = (( ((torch.sparse.mm(G12, G1.to_dense()))>0).float() - G12 - G1 - eyes1)>0).float()
-                G23 = (( ((torch.sparse.mm(G22, G2.to_dense()))>0).float() - G22 - G2 - eyes2)>0).float()
+                G12 = (( ((torch.mm(G1, G1))>0).float() - G1 - eyes1)>0).float()
+                G22 = (( ((torch.mm(G2, G2))>0).float() - G2 - eyes2)>0).float()
+                G13 = (( ((torch.mm(G12, G1))>0).float() - G12 - G1 - eyes1)>0).float()
+                G23 = (( ((torch.mm(G22, G2))>0).float() - G22 - G2 - eyes2)>0).float()
             
                 # SeedGNN
                 seedgnn[thetai] += test(datasets)
