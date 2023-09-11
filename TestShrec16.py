@@ -85,10 +85,10 @@ def run(L,Theta):
                 
                 eyes1 = torch.eye(n1)
                 eyes2 = torch.eye(n2)
-                # G12 = (( ((torch.sparse.mm(G1.to_dense(), G1))>0).float() - G1 - eyes1)>0).float()
-                # G22 = (( ((torch.sparse.mm(G2.to_dense(), G2))>0).float() - G2 - eyes2)>0).float()
-                # G13 = (( ((torch.sparse.mm(G12, G1))>0).float() - G12 - G1 - eyes1)>0).float()
-                # G23 = (( ((torch.sparse.mm(G22, G2))>0).float() - G22 - G2 - eyes2)>0).float()
+                G12 = (( ((torch.mm(G1, G1))>0).float() - G1 - eyes1)>0).float()
+                G22 = (( ((torch.mm(G2, G2))>0).float() - G2 - eyes2)>0).float()
+                G13 = (( ((torch.mm(G12, G1))>0).float() - G12 - G1 - eyes1)>0).float()
+                G23 = (( ((torch.mm(G22, G2))>0).float() - G22 - G2 - eyes2)>0).float()
             
                 # SeedGNN
                 seedgnn[thetai] += test(datasets)
